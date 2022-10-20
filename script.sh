@@ -1,10 +1,13 @@
 #!/bin/bash
 
-PassRootDB="zabbix"
-PassZABBIXDB="zabbix"
+PassRootDB="passrootdb"
+PassZABBIXDB="passzabbixdb"
 
-wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-4%2Bdebian11_all.deb
-dpkg -i zabbix-release_6.0-4+debian11_all.deb
+mkdir -p /tmp/workdir/zabbix
+cd /tmp/workdir/zabbix
+
+wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-4%2Bdebian11_all.deb -O zabbix-release.deb
+dpkg -i zabbix-release.deb
 apt update
 
 apt install zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent
