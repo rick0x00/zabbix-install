@@ -8,12 +8,12 @@ apt install zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sq
 
 apt install mariadb-client mariadb-server
 
-mysql -uroot -p
-
-echo "create database zabbix character set utf8mb4 collate utf8mb4_bin;
-mysql> create user zabbix@localhost identified by 'password';
-mysql> grant all privileges on zabbix.* to zabbix@localhost;
-mysql> quit;"
+#mysql -uroot -p
+mysql -e "SET PASSWORD FOR 'root'@localhost = PASSWORD("$PassRootDB");"
+mysql -e "create database zabbix character set utf8mb4 collate utf8mb4_bin;"
+mysql -e "create user zabbix@localhost identified by 'password';"
+mysql -e "grant all privileges on zabbix.* to zabbix@localhost;"
+mysql -e "FLUSH PRIVILEGES;"
 
 zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p zabbix
 
