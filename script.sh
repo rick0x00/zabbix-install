@@ -24,10 +24,12 @@ mysql -uroot -p"$PassRootDB" -e "FLUSH PRIVILEGES;"
 
 zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p"$PassZABBIXDB" zabbix
 
-nano /etc/zabbix/zabbix_server.conf
-echo "DBPassword=$PassZABBIXDB"
+sed "s/# DBPassword=/DBPassword=$PassZABBIXDB/" /etc/zabbix/zabbix_server.conf > /etc/zabbix/zabbix_server.conf.new
 
-locale-gen "en_US.UTF-8"
+mv /etc/zabbix/zabbix_server.conf /etc/zabbix/zabbix_server.conf.bkp
+mv /etc/zabbix/zabbix_server.conf.new /etc/zabbix/zabbix_server.conf
+
+localectl set-locale en_US.UTF-8
 
 systemctl restart zabbix-server zabbix-agent apache2
 systemctl enable zabbix-server zabbix-agent apache2
