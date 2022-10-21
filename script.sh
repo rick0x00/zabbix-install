@@ -3,33 +3,69 @@
 PassRootDB="passrootdb"
 PassZABBIXDB="passzabbixdb"
 
-mkdir -p /tmp/workdir/zabbix
-cd /tmp/workdir/zabbix
+prepare-workdir(){
+    mkdir -p /tmp/workdir/zabbix
+    cd /tmp/workdir/zabbix
+}
 
-wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-4%2Bdebian11_all.deb -O zabbix-release.deb
-dpkg -i zabbix-release.deb
-apt update
+install-zabbix-repo(){
+    wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-4%2Bdebian11_all.deb -O zabbix-release.deb
+    dpkg -i zabbix-release.deb
+    apt update
+}
 
-apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent
+install-zabbix-server(){
+    apt install -y zabbix-server-mysql zabbix-sql-scripts
+}
 
-apt install -y mariadb-client mariadb-server
+install-zabbix-frontend(){
+    apt install -y zabbix-frontend-php zabbix-apache-conf
+}
 
-#mysql -uroot -p
-mysql -e "SET PASSWORD FOR 'root'@localhost = PASSWORD('$PassRootDB');"
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$PassRootDB';"
-mysql -uroot -p"$PassRootDB" -e "create database zabbix character set utf8mb4 collate utf8mb4_bin;"
-mysql -uroot -p"$PassRootDB" -e "create user zabbix@localhost identified by '$PassZABBIXDB';"
-mysql -uroot -p"$PassRootDB" -e "grant all privileges on zabbix.* to zabbix@localhost;"
-mysql -uroot -p"$PassRootDB" -e "FLUSH PRIVILEGES;"
+install-zabbix-agent(){
+    apt install -y zabbix-agent
+}
 
-zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p"$PassZABBIXDB" zabbix
+install-complements(){
+    apt install -y mariadb-client mariadb-server
+}
 
-sed "s/# DBPassword=/DBPassword=$PassZABBIXDB/" /etc/zabbix/zabbix_server.conf > /etc/zabbix/zabbix_server.conf.new
+create-initial-database(){
+    #mysql -uroot -p
+    mysql -e "SET PASSWORD FOR 'root'@localhost = PASSWORD('$PassRootDB');"
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$PassRootDB';"
+    mysql -uroot -p"$PassRootDB" -e "create database zabbix character set utf8mb4 collate utf8mb4_bin;"
+    mysql -uroot -p"$PassRootDB" -e "create user zabbix@localhost identified by '$PassZABBIXDB';"
+    mysql -uroot -p"$PassRootDB" -e "grant all privileges on zabbix.* to zabbix@localhost;"
+    mysql -uroot -p"$PassRootDB" -e "FLUSH PRIVILEGES;"
 
-mv /etc/zabbix/zabbix_server.conf /etc/zabbix/zabbix_server.conf.bkp
-mv /etc/zabbix/zabbix_server.conf.new /etc/zabbix/zabbix_server.conf
+    zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p"$PassZABBIXDB" zabbix
+}
 
-localectl set-locale en_US.UTF-8
+configure-database-zabbix-server(){
+    sed "s/# DBPassword=/DBPassword=$PassZABBIXDB/" /etc/zabbix/zabbix_server.conf > /etc/zabbix/zabbix_server.conf.new
 
-systemctl restart zabbix-server zabbix-agent apache2
-systemctl enable zabbix-server zabbix-agent apache2
+    mv /etc/zabbix/zabbix_server.conf /etc/zabbix/zabbix_server.conf.bkp
+    mv /etc/zabbix/zabbix_server.conf.new /etc/zabbix/zabbix_server.conf
+
+}
+
+configure-locale(){
+    localectl set-locale en_US.UTF-8
+}
+
+start-zabbix-and-agent-process(){
+    systemctl restart zabbix-server zabbix-agent apache2
+    systemctl enable zabbix-server zabbix-agent apache2
+}
+
+prepare-workdir;
+install-zabbix-repo;
+install-zabbix-server;
+install-zabbix-frontend;
+install-zabbix-agent;
+install-complements;
+create-initial-database;
+configure-database-zabbix-server;
+configure-locale;
+start-zabbix-and-agent-process;
