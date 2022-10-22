@@ -3,6 +3,26 @@
 PassRootDB="passrootdb"
 PassZABBIXDB="passzabbixdb"
 
+equal="================================================================";
+
+# start define functions
+
+processing_error() {
+    echo "$equal"
+    echo ""
+    echo "$*"
+    echo ""
+    echo "$equal"
+}
+
+root_check(){
+    uid=$(id -u)
+    if [ $uid -ne 0 ]; then
+        processing_error "Please use ROOT user for run the script."
+        exit 1
+    fi
+}
+
 prepare-workdir(){
     mkdir -p /tmp/workdir/zabbix
     cd /tmp/workdir/zabbix
@@ -59,6 +79,12 @@ start-zabbix-and-agent-process(){
     systemctl enable zabbix-server zabbix-agent apache2
 }
 
+# end define functions
+
+# start sequence executions
+
+root_check;
+
 prepare-workdir;
 install-zabbix-repo;
 install-zabbix-server;
@@ -69,3 +95,5 @@ create-initial-database;
 configure-database-zabbix-server;
 configure-locale;
 start-zabbix-and-agent-process;
+
+# start sequence executions
