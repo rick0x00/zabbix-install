@@ -7,6 +7,16 @@ equal="================================================================";
 
 # start define functions
 
+print_help() {
+    echo ''
+    echo 'Usage:  script.sh [ OPTION ]'   
+    echo '  OPTION: (optional)'
+    echo '  -h          print this help'
+    echo '  -PRDB       Define Password to Root DB'
+    echo '  -PZDB       Define Password to zabbiz DB'
+    echo ''
+}
+
 processing_error() {
     echo "$equal"
     echo ""
@@ -81,9 +91,26 @@ start-zabbix-and-agent-process(){
 
 # end define functions
 
+
 # start sequence executions
 
 root_check;
+
+# start read CLI Arguments
+while [ -n "$1" ]; do
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        print_usage
+        exit 0
+    elif [ "$1" = "-PRDB" ]; then
+        shift
+        PassRootDB="$1"
+    elif [ "$1" = "-PZDB" ]; then
+        shift
+        PassZABBIXDB="$1"
+    fi
+    shift
+done
+# end read CLI Arguments
 
 prepare-workdir;
 install-zabbix-repo;
