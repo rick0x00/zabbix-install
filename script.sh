@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-PassRootDB="passrootdb"
-PassZABBIXDB="passzabbixdb"
+passrootdb="passrootdb"
+passzabbixdb="passzabbixdb"
 
 equal="================================================================";
 
@@ -13,7 +13,7 @@ print_help() {
     echo '  OPTION: (optional)'
     echo '  -h          print this help'
     echo '  -PRDB       Define Password to Root DB'
-    echo '  -PZDB       Define Password to zabbiz DB'
+    echo '  -PZDB       Define Password to Zabbix DB'
     echo ''
 }
 
@@ -62,18 +62,18 @@ install-complements(){
 
 create-initial-database(){
     #mysql -uroot -p
-    mysql -e "SET PASSWORD FOR 'root'@localhost = PASSWORD('$PassRootDB');"
-    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$PassRootDB';"
-    mysql -uroot -p"$PassRootDB" -e "create database zabbix character set utf8mb4 collate utf8mb4_bin;"
-    mysql -uroot -p"$PassRootDB" -e "create user zabbix@localhost identified by '$PassZABBIXDB';"
-    mysql -uroot -p"$PassRootDB" -e "grant all privileges on zabbix.* to zabbix@localhost;"
-    mysql -uroot -p"$PassRootDB" -e "FLUSH PRIVILEGES;"
+    mysql -e "SET PASSWORD FOR 'root'@localhost = PASSWORD('$passrootdb');"
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$passrootdb';"
+    mysql -uroot -p"$passrootdb" -e "create database zabbix character set utf8mb4 collate utf8mb4_bin;"
+    mysql -uroot -p"$passrootdb" -e "create user zabbix@localhost identified by '$passzabbixdb';"
+    mysql -uroot -p"$passrootdb" -e "grant all privileges on zabbix.* to zabbix@localhost;"
+    mysql -uroot -p"$passrootdb" -e "FLUSH PRIVILEGES;"
 
-    zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p"$PassZABBIXDB" zabbix
+    zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p"$passzabbixdb" zabbix
 }
 
 configure-database-zabbix-server(){
-    sed "s/# DBPassword=/DBPassword=$PassZABBIXDB/" /etc/zabbix/zabbix_server.conf > /etc/zabbix/zabbix_server.conf.new
+    sed "s/# DBPassword=/DBPassword=$passzabbixdb/" /etc/zabbix/zabbix_server.conf > /etc/zabbix/zabbix_server.conf.new
 
     mv /etc/zabbix/zabbix_server.conf /etc/zabbix/zabbix_server.conf.bkp
     mv /etc/zabbix/zabbix_server.conf.new /etc/zabbix/zabbix_server.conf
@@ -99,14 +99,14 @@ root_check;
 # start read CLI Arguments
 while [ -n "$1" ]; do
     if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-        print_usage
+        print_help;
         exit 0
     elif [ "$1" = "-PRDB" ]; then
         shift
-        PassRootDB="$1"
+        passrootdb=$(echo $1)
     elif [ "$1" = "-PZDB" ]; then
         shift
-        PassZABBIXDB="$1"
+        passzabbixdb=$(echo $1)
     fi
     shift
 done
