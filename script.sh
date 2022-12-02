@@ -89,6 +89,12 @@ start-zabbix-and-agent-process(){
     systemctl enable zabbix-server zabbix-agent apache2
 }
 
+set-zabbix-default-page(){
+    cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf.bkp_$(date +%s)
+    sed "/DocumentRoot/s/var\/www\/html/usr\/share\/zabbix/" /etc/apache2/sites-available/000-default.conf > /etc/apache2/sites-available/000-default.conf
+    systemctl restart apache2.service
+}
+
 # end define functions
 
 
@@ -122,5 +128,6 @@ create-initial-database;
 configure-database-zabbix-server;
 configure-locale;
 start-zabbix-and-agent-process;
+set-zabbix-default-page;
 
 # start sequence executions
