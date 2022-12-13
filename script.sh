@@ -91,7 +91,7 @@ start-zabbix-and-agent-process(){
 
 set-zabbix-default-page(){
     cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf.bkp_$(date +%s)
-    sed "/DocumentRoot/s/var\/www\/html/usr\/share\/zabbix/" /etc/apache2/sites-available/000-default.conf > /etc/apache2/sites-available/000-default.conf
+    sed -i "/DocumentRoot/s/var\/www\/html/usr\/share\/zabbix/" /etc/apache2/sites-available/000-default.conf
     systemctl restart apache2.service
 }
 
