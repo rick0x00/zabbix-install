@@ -100,6 +100,12 @@ disable-directory-listing(){
     sed -i "/Options/s/Indexes FollowSymLinks/FollowSymLinks/" /etc/apache2/apache2.conf
 }
 
+disable-apache-server-banner(){
+    cp /etc/apache2/conf-enabled/security.conf /etc/apache2/conf-enabled/security.conf.bkp_$(date +%s)
+    sed -i "/ServerTokens/s/OS/Prod/" /etc/apache2/conf-enabled/security.conf
+    sed -i "/ServerSignature/s/On/Off/" /etc/apache2/conf-enabled/security.conf
+}
+
 # end define functions
 
 
@@ -135,5 +141,6 @@ configure-locale;
 start-zabbix-and-agent-process;
 set-zabbix-default-page;
 disable-directory-listing;
+disable-apache-server-banner;
 
 # end sequence executions
