@@ -92,7 +92,6 @@ start-zabbix-and-agent-process(){
 set-zabbix-default-page(){
     cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf.bkp_$(date +%s)
     sed -i "/DocumentRoot/s/var\/www\/html/usr\/share\/zabbix/" /etc/apache2/sites-available/000-default.conf
-    systemctl restart apache2.service
 }
 
 disable-apache-directory-listing(){
@@ -144,3 +143,6 @@ disable-apache-directory-listing;
 disable-apache-server-banner;
 
 # end sequence executions
+
+# finish configurations an restart apache server
+    systemctl restart apache2.service
