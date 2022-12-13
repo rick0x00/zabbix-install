@@ -130,4 +130,4 @@ configure-locale;
 start-zabbix-and-agent-process;
 set-zabbix-default-page;
 
-# start sequence executions
+# end sequence executions
