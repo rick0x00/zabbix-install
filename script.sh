@@ -95,6 +95,11 @@ set-zabbix-default-page(){
     systemctl restart apache2.service
 }
 
+disable-directory-listing(){
+    cp /etc/apache2/apache2.conf /etc/apache2/apache2.conf.bkp_$(date +%s)
+    sed -i "/Options/s/Indexes FollowSymLinks/FollowSymLinks/" /etc/apache2/apache2.conf
+}
+
 # end define functions
 
 
@@ -129,5 +134,6 @@ configure-database-zabbix-server;
 configure-locale;
 start-zabbix-and-agent-process;
 set-zabbix-default-page;
+disable-directory-listing;
 
 # end sequence executions
